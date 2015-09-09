@@ -14,4 +14,5 @@ Import endianstream
 	Import wrapperstream
 	Import chainstream
 	Import repeater
+	Import stdio
 #End
