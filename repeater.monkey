@@ -12,7 +12,7 @@ Import brl.stream
 ' Imports (Private):
 Private
 
-Import streamwrapper
+Import wrapperstream
 
 Import brl.databuffer
 
@@ -30,15 +30,15 @@ Class Repeater Extends SpecializedRepeater<Stream, Stream> Final
 	End
 	
 	Method New(InputStream:InputStreamType, SynchronizedFinish:Bool=False, CanCloseInputStream:Bool=False, CanCloseOutputStreams:Bool=False)
-		Super.New(InputStream, SyhcnronizedFinish, CanCloseInputStream, CanCloseOutputStreams)
+		Super.New(InputStream, SynchronizedFinish, CanCloseInputStream, CanCloseOutputStreams)
 	End
 	
 	Method New(InputStream:InputStreamType, Streams:Stack<OutputStreamType>, SynchronizedFinish:Bool=False, CanCloseInputStream:Bool=False, CanCloseOutputStreams:Bool=False)
-		Super.New(InputStream, Streams, SyhcnronizedFinish, CanCloseInputStream, CanCloseOutputStreams)
+		Super.New(InputStream, Streams, SynchronizedFinish, CanCloseInputStream, CanCloseOutputStreams)
 	End
 End
 
-Class SpecializedRepeater<InputStreamType OutputStreamType> Extends StreamWrapper<InputStreamType>
+Class SpecializedRepeater<InputStreamType, OutputStreamType> Extends WrapperStream<InputStreamType>
 	' Constructor(s) (Public):
 	Method New(SynchronizedFinish:Bool=True, CanCloseOutputStreams:Bool=False)
 		Self.SynchronizedFinish = SynchronizedFinish
