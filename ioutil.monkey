@@ -8,6 +8,7 @@ Public
 ' Imports:
 Import publicdatastream
 Import endianstream
+Import errors
 
 ' Experimental:
 #If IOUTIL_EXPERIMENTAL

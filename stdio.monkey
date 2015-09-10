@@ -8,15 +8,19 @@ Public
 #End
 
 #If IOUTIL_STDIO_IMPLEMENTED
-	#If HOST = "winnt"
-		#If LANG = "cpp"
+	#If LANG = "cpp"
+		#If HOST = "winnt"
 			#BBSTDSTREAM_WINNT_NATIVE_HANDLES = True
 			'#BBSTDSTREAM_STD_BINARYHACK = True
 			'#BBSTDSTREAM_WINNT_STD_REOPENHACK = True
 		#End
+		
+		#BBSTDSTREAM_FLUSH_IMPLEMENTED = True
 	#End
 	
 	' Imports (Public):
+	Import errors
+	
 	Import brl.stream
 	
 	' Imports (Private):
@@ -50,6 +54,10 @@ Public
 				Method ErrOpen:Bool()
 			#End
 			
+			#If BBSTDSTREAM_FLUSH_IMPLEMENTED
+				Method Flush:Void()
+			#End
+			
 			Method Length:Int()
 			Method Position:Int()
 			Method Seek:Int(Position:Int)
@@ -59,24 +67,44 @@ Public
 	
 	' Classes (Monkey):
 	Class StandardIOStream Extends Stream
-		' Functions (Protected):
+		' Constructor(s) (Public):
+		
+		' The 'ErrorInfo' argument should only be changed with
+		' full understanding of the target it is used on.
+		' If unsure, do not specify an argument.
+		Method New(ErrorInfo:Bool=False)
+			OpenNativeStream(ErrorInfo)
+		End
+		
+		Method New(Path:String, Mode:String, Fallback:Bool=False)
+			OpenNativeStream(Path, Mode, Fallback)
+		End
+		
+		' Constructor(s) (Protected):
 		Protected
 		
-		Function OpenNativeStream:BBStandardIOStream(ErrorInfo:Bool=False)
+		Method OpenNativeStream:Void(ErrorInfo:Bool=False)
 			Local StandardStream:= New BBStandardIOStream()
 			
 				If (Not ErrorInfo) Then
-					StandardStream.Open()
+					If (Not StandardStream.Open()) Then
+						Throw New InvalidOpenOperation(Self)
+					Endif
 			#If LANG = "cpp"
 				Else
-					StandardStream.ErrOpen()
+					If (Not StandardStream.ErrOpen()) Then
+						Throw New InvalidOpenOperation(Self)
+					Endif
 			#End
+					Throw New UnsupportedStreamOperation(Self)
 				Endif
 			
-			Return StandardStream
+			RealHandle = StandardStream
+			
+			Return
 		End
 		
-		Function OpenNativeStream:BBStream(Path:String, Mode:String, Fallback:Bool=False)
+		Method OpenNativeStream:Void(Path:String, Mode:String, Fallback:Bool=False)
 			#If LANG = "cpp"
 				Local StandardStream:= New BBStandardIOStream()
 				
@@ -89,7 +117,7 @@ Public
 				#End
 				
 				If (Not StandardStream.Open(Path, RealMode, Fallback)) Then
-					Return Null
+					Throw New InvalidOpenOperation(Self)
 				Endif
 				
 				#If Not BBSTDSTREAM_WINNT_NATIVE_HANDLES
@@ -98,26 +126,19 @@ Public
 					Endif
 				#End
 				
-				Return StandardStream
+				RealHandle = StandardStream
 			#Elseif LANG = "cs"
 				Local FStream:= New BBFileStream()
 				
-				FStream.Open(Path, Mode)
+				If (Not FStream.Open(Path, Mode)) Then
+					Throw New InvalidOpenOperation(Self)
+				Endif
 				
-				Return FStream
+				NativeStream = FStream
 			#End
 		End
 		
 		Public
-		
-		' Constructor(s):
-		Method New(ErrorInfo:Bool=False)
-			NativeStream = OpenNativeStream(ErrorInfo)
-		End
-		
-		Method New(Path:String, Mode:String, Fallback:Bool=False)
-			NativeStream = OpenNativeStream(Path, Mode, Fallback)
-		End
 		
 		' Destructor(s):
 		Method Close:Void()
@@ -125,14 +146,27 @@ Public
 				Return
 			Endif
 			
+			If (RealHandle <> NativeStream And RealHandle <> Null) Then
+				RealHandle.Close()
+			Endif
+			
 			NativeStream.Close()
 			
 			NativeStream = Null
+			RealHandle = Null
 			
 			Return
 		End
 		
 		' Methods:
+		Method Flush:Void()
+			#If BBSTDSTREAM_FLUSH_IMPLEMENTED
+				RealHandle.Flush()
+			#End
+			
+			Return
+		End
+		
 		Method Seek:Int(Position:Int)
 			Return NativeStream.Seek(Position)
 		End
@@ -145,7 +179,7 @@ Public
 			Return NativeStream.Write(Buffer, Offset, Count)
 		End
 		
-		' Properties:
+		' Properties (Public):
 		Method Eof:Int() Property
 			Return NativeStream.Eof()
 		End
@@ -158,10 +192,34 @@ Public
 			Return NativeStream.Position()
 		End
 		
+		' Properties (Protected):
+		Protected
+		
+		Method RealHandle:BBStandardIOStream() Property
+			Return Self._RealHandle
+		End
+		
+		Method RealHandle:Void(Input:BBStandardIOStream) Property
+			Self._RealHandle = Input
+			
+			If (NativeStream <> Null) Then
+				NativeStream.Close()
+			Endif
+			
+			NativeStream = Input
+			
+			Return
+		End
+		
+		Public
+		
 		' Fields (Protected):
 		Protected
 		
 		Field NativeStream:BBStream ' BBStandardIOStream
+		
+		' This handle may or may not be set, depending on the situation.
+		Field _RealHandle:BBStandardIOStream
 		
 		Public
 	End

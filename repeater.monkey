@@ -14,6 +14,8 @@ Private
 
 Import wrapperstream
 
+Import sizeof
+
 Import brl.databuffer
 
 Public
@@ -149,6 +151,31 @@ Class SpecializedRepeater<InputStreamType, OutputStreamType> Extends WrapperStre
 		Return OutputPosition
 	End
 	
+	' If an 'InputStream' is available, this may be used to transfer
+	' 'Count' bytes from that stream to all of the output streams.
+	Method TransferFromInput:Int(Count:Int)
+		Local TempBuffer:= New DataBuffer(Count)
+		
+		ReadAll(TempBuffer, 0, Count)
+		
+		Local BytesTransferred:= WriteAll(TempBuffer, 0, Count)
+		
+		TempBuffer.Discard()
+		
+		Return BytesTransferred
+	End
+	
+	' This will transfer all data available from 'InputStream'; use with caution.
+	Method TransferInput:Int()
+		Local InputData:= ReadAll()
+		
+		Local BytesTransferred:= WriteAll(InputData, 0, InputData.Length)
+		
+		InputData.Discard()
+		
+		Return BytesTransferred
+	End
+	
 	Method Write:Int(Buffer:DataBuffer, Offset:Int, Count:Int)
 		Local MaxBytesTransferred:= 0
 		
@@ -191,6 +218,8 @@ Class SpecializedRepeater<InputStreamType, OutputStreamType> Extends WrapperStre
 			S.WriteByte(Value)
 		Next
 		
+		OutputPosition += SizeOf_Byte
+		
 		Return
 	End
 	
@@ -198,6 +227,8 @@ Class SpecializedRepeater<InputStreamType, OutputStreamType> Extends WrapperStre
 		For Local S:= Eachin Streams
 			S.WriteShort(Value)
 		Next
+		
+		OutputPosition += SizeOf_Short
 		
 		Return
 	End
@@ -207,6 +238,8 @@ Class SpecializedRepeater<InputStreamType, OutputStreamType> Extends WrapperStre
 			S.WriteInt(Value)
 		Next
 		
+		OutputPosition += SizeOf_Integer
+		
 		Return
 	End
 	
@@ -214,6 +247,48 @@ Class SpecializedRepeater<InputStreamType, OutputStreamType> Extends WrapperStre
 		For Local S:= Eachin Streams
 			S.WriteFloat(Value)
 		Next
+		
+		OutputPosition += SizeOf_FloatingPoint
+		
+		Return
+	End
+	
+	Method WriteString:Void(Value:String, Encoding:String="utf8")
+		Local StreamResult:= 0
+		
+		For Local S:= Eachin Streams
+			Local CurrentPosition:= S.Position
+			
+			S.WriteString(Value, Encoding)
+			
+			StreamResult = Max(StreamResult, (S.Position-CurrentPosition))
+		Next
+		
+		If (StreamResult <= 0) Then
+			OutputPosition += SizeOf(Value)
+		Else
+			OutputPosition += StreamResult
+		Endif
+		
+		Return
+	End
+	
+	Method WriteLine:Void(Str:String)
+		Local StreamResult:= 0
+		
+		For Local S:= Eachin Streams
+			Local CurrentPosition:= S.Position
+			
+			S.WriteLine(Str)
+			
+			StreamResult = Max(StreamResult, (S.Position-CurrentPosition))
+		Next
+		
+		If (StreamResult <= 0) Then
+			OutputPosition += SizeOf(Str) + (SizeOf_Byte*2) ' (SizeOf_Char*2)
+		Else
+			OutputPosition += StreamResult
+		Endif
 		
 		Return
 	End

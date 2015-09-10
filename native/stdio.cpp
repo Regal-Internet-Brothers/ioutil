@@ -64,6 +64,8 @@ namespace external_ioutil
 			bool Open(String path, String mode, bool fallback);
 			bool ErrOpen();
 			
+			void Flush();
+			
 			int Eof(); // const;
 			int Length(); // const;
 			int Position(); // const;
@@ -392,6 +394,19 @@ namespace external_ioutil
 		
 		// Return the default response.
 		return true;
+	}
+	
+	void BBStandardIOStream::Flush()
+	{
+		#ifndef CFG_BBSTDSTREAM_WINNT_NATIVE_HANDLES
+			if (input != FILE_STREAM_NONE)
+				fflush(input);
+			
+			if (output != FILE_STREAM_NONE)
+				fflush(output);
+		#endif
+		
+		return;
 	}
 	
 	int BBStandardIOStream::Eof() // const
