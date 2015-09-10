@@ -2,11 +2,16 @@ Strict
 
 Public
 
+' Preprocessor related:
 #If TARGET = "stdcpp" Or TARGET = "glfw" ' Or TARGET = "ios"
 	#IOUTIL_STDIO_IMPLEMENTED = True
 #End
 
 #If IOUTIL_STDIO_IMPLEMENTED
+	#If HOST = "winnt"
+		#BBSTDSTREAM_WINNT_NATIVE_HANDLES = True
+	#End
+	
 	' Imports (Public):
 	Import brl.stream
 	
@@ -24,7 +29,7 @@ Public
 	' Classes (External):
 	Extern
 	
-	Class BBStandardIOStream Extends BBStream
+	Class BBStandardIOStream Extends BBStream = "external_ioutil::BBStandardIOStream"
 		' Methods:
 		Method Open:Bool()
 		Method Open:Bool(Path:String, Mode:String)

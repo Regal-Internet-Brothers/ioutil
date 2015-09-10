@@ -11,6 +11,8 @@ Function Main:Int()
 	
 	Console.WriteLine("Hello, World.")
 	
+	'Print(Console.ReadLine())
+	
 	Console.Close()
 	
 	' Return the default response.
