@@ -22,8 +22,15 @@ Class WrapperStream<StreamType> Extends Stream
 	Method New(S:StreamType)
 		Self.InternalStream = S
 	End
+	
+	' Destructor(s):
+	Method Close:Void()
+		InternalStream.Close()
+		
+		Return
+	End
 
-	' Methods:
+	' Methods (Public):
 	Method Read:Int(Buffer:DataBuffer, Offset:Int, Count:Int)
 		Return InternalStream.Read(Buffer, Offset, Count)
 	End
@@ -112,12 +119,6 @@ Class WrapperStream<StreamType> Extends Stream
 		Return
 	End
 	
-	Method Close:Void()
-		InternalStream.Close()
-		
-		Return
-	End
-	
 	Method Seek:Int(Position:Int)
 		Return InternalStream.Seek(Position)
 	End
@@ -127,6 +128,30 @@ Class WrapperStream<StreamType> Extends Stream
 		
 		Return
 	End
+	
+	' Methods (Protected):
+	Protected
+	
+	Method InternalReadAll:Void(Buffer:DataBuffer, Offset:Int, Count:Int)
+		' Call the super-class's implementation.
+		Super.ReadAll(Buffer, Offset, Count)
+		
+		Return
+	End
+	
+	Method InternalReadAll:DataBuffer()
+		' Call the super-class's implementation.
+		Return Super.ReadAll()
+	End
+	
+	Method InternalWriteAll:Void(Buffer:DataBuffer, Offset:Int, Count:Int)
+		' Call the super-class's implementation.
+		Super.WriteAll(Buffer, Offset, Count)
+		
+		Return
+	End
+	
+	Public
 	
 	' Properties:
 	Method Eof:Int() Property

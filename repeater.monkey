@@ -169,11 +169,19 @@ Class SpecializedRepeater<InputStreamType, OutputStreamType> Extends WrapperStre
 	Method TransferInput:Int()
 		Local InputData:= ReadAll()
 		
-		Local BytesTransferred:= WriteAll(InputData, 0, InputData.Length)
+		WriteAll(InputData, 0, InputData.Length)
+		
+		Local BytesTransferred:= InputData.Length
 		
 		InputData.Discard()
 		
 		Return BytesTransferred
+	End
+	
+	Method WriteAll:Void(Buffer:DataBuffer, Offset:Int, Count:Int)
+		InternalWriteAll(Buffer, Offset, Count)
+		
+		Return
 	End
 	
 	Method Write:Int(Buffer:DataBuffer, Offset:Int, Count:Int)
