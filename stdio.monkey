@@ -10,6 +10,8 @@ Public
 #If IOUTIL_STDIO_IMPLEMENTED
 	#If HOST = "winnt"
 		#BBSTDSTREAM_WINNT_NATIVE_HANDLES = True
+		'#BBSTDSTREAM_STD_BINARYHACK = True
+		'#BBSTDSTREAM_WINNT_STD_REOPENHACK = True
 	#End
 	
 	' Imports (Public):
@@ -32,7 +34,7 @@ Public
 	Class BBStandardIOStream Extends BBStream = "external_ioutil::BBStandardIOStream"
 		' Methods:
 		Method Open:Bool()
-		Method Open:Bool(Path:String, Mode:String)
+		Method Open:Bool(Path:String, Mode:String, Fallback:Bool=False)
 		Method ErrOpen:Bool()
 		
 		Method Length:Int()
@@ -59,22 +61,26 @@ Public
 			Return StandardStream
 		End
 		
-		Function OpenNativeStream:BBStandardIOStream(Path:String, Mode:String)
+		Function OpenNativeStream:BBStandardIOStream(Path:String, Mode:String, Fallback:Bool=False)
 			Local StandardStream:= New BBStandardIOStream()
 			
 			Local RealMode:= Mode
 			
-			If (RealMode = "a") Then
-				RealMode = "u"
-			Endif
+			#If Not BBSTDSTREAM_WINNT_NATIVE_HANDLES
+				If (RealMode = "a") Then
+					RealMode = "u"
+				Endif
+			#End
 			
-			If (Not StandardStream.Open(Path, RealMode)) Then
+			If (Not StandardStream.Open(Path, RealMode, Fallback)) Then
 				Return Null
 			Endif
 			
-			If (Mode = "a") Then
-				StandardStream.Seek(StandardStream.Length())
-			Endif
+			#If Not BBSTDSTREAM_WINNT_NATIVE_HANDLES
+				If (Mode = "a") Then
+					StandardStream.Seek(StandardStream.Length())
+				Endif
+			#End
 			
 			Return StandardStream
 		End
@@ -86,8 +92,8 @@ Public
 			NativeStream = OpenNativeStream(ErrorInfo)
 		End
 		
-		Method New(Path:String, Mode:String)
-			NativeStream = OpenNativeStream(Path, Mode)
+		Method New(Path:String, Mode:String, Fallback:Bool=False)
+			NativeStream = OpenNativeStream(Path, Mode, Fallback)
 		End
 		
 		' Destructor(s):

@@ -13,11 +13,19 @@
 	#define WIN32_LEAN_AND_MEAN
 	
 	#include <windows.h>
+	//#include <winbase.h>
+	#include <tchar.h>
+	//#include <shlwapi.h>
 #else
 	//#include <cstdio>
+	
+	#ifdef CFG_BBSTDSTREAM_STD_BINARYHACK
+		#include <io.h>
+		#include <fcntl.h>
+	#endif
 #endif
 
-// Namespaces:
+// Namespace(s):
 namespace external_ioutil
 {
 	// Typedefs:
@@ -52,8 +60,8 @@ namespace external_ioutil
 			void Close();
 			
 			// Methods:
-			bool Open();
-			bool Open(String path, String mode);
+			bool Open(bool rawOpen=false);
+			bool Open(String path, String mode, bool fallback);
 			bool ErrOpen();
 			
 			int Eof(); // const;
@@ -82,7 +90,7 @@ namespace external_ioutil
 }
 // ***** standardiostream.cpp *****
 
-// Namespaces:
+// Namespace(s):
 namespace external_ioutil
 {
 	// Classes:
@@ -156,23 +164,51 @@ namespace external_ioutil
 	}
 	
 	// Methods (Public):
-	bool BBStandardIOStream::Open()
+	bool BBStandardIOStream::Open(bool rawOpen)
 	{
-		if (hasFileOpen())
+		if (!rawOpen && hasFileOpen())
 			return false;
 		
-		//freopen(0, "rb", stdin);
-		//freopen(0, "wb", stdout);
-		
-		//freopen("CONOUT$", "wb", stdout);
-		//freopen("CONIN$", "rb", stdin);
-		
 		#ifndef CFG_BBSTDSTREAM_WINNT_NATIVE_HANDLES
-			input = stdin;
-			output = stdout;
+			if (input == FILE_STREAM_NONE)
+			{
+				#ifndef CFG_BBSTDSTREAM_STD_BINARYHACK
+					#ifndef CFG_BBSTDSTREAM_WINNT_STD_REOPENHACK
+						freopen(0, "rb", stdin);
+					#else
+						freopen("CONIN$", "rb", stdin);
+					#endif
+				#else
+					_setmode(_fileno(stdin), _O_BINARY);
+				#endif
+				
+				input = stdin;
+			}
+			
+			if (output == FILE_STREAM_NONE)
+			{
+				#ifndef CFG_BBSTDSTREAM_STD_BINARYHACK
+					#ifndef CFG_BBSTDSTREAM_WINNT_STD_REOPENHACK
+						freopen(0, "wb", stdout);
+					#else
+						freopen("CONOUT$", "wb", stdout);
+					#endif
+				#else
+					_setmode(_fileno(stdout), _O_BINARY);
+				#endif
+				
+				output = stdout;
+			}
 		#else
-			input = GetStdHandle(STD_INPUT_HANDLE);
-			output = GetStdHandle(STD_OUTPUT_HANDLE);
+			if (input == FILE_STREAM_NONE)
+			{
+				input = GetStdHandle(STD_INPUT_HANDLE);
+			}
+			
+			if (output == FILE_STREAM_NONE)
+			{
+				output = GetStdHandle(STD_OUTPUT_HANDLE);
+			}
 			
 			if
 			(
@@ -190,17 +226,84 @@ namespace external_ioutil
 		return true;
 	}
 	
-	bool BBStandardIOStream::Open(String path, String mode)
+	bool BBStandardIOStream::Open(String path, String mode, bool fallback)
 	{
-		#ifdef CFG_BBSTDSTREAM_WINNT_NATIVE_HANDLES
+		if (hasFileOpen())
 			return false;
-		#else
-			if (hasFileOpen())
+		
+		bool isInput = false;
+		bool isOutput = false;
+		bool moveToEnd = false;
+		
+		#ifdef CFG_BBSTDSTREAM_WINNT_NATIVE_HANDLES
+			systemFile file = FILE_STREAM_NONE;
+			OFSTRUCT fileInfo;
+			
+			memset(&fileInfo, 0, sizeof(fileInfo));
+			
+			fileInfo.cBytes = sizeof(fileInfo);
+			
+			if (mode == "r")
+			{
+				file = (systemFile)OpenFile((LPCSTR)path.ToCString<CHAR>(), &fileInfo, OF_READ);
+				
+				isInput = true;
+			}
+			else if (mode == "w")
+			{
+				file = (systemFile)OpenFile((LPCSTR)path.ToCString<CHAR>(), &fileInfo, OF_WRITE);
+				
+				isOutput = true;
+			}
+			else
+			{
+				bool mode_is_U = (mode == "u");
+				bool mode_is_A = (mode == "a");
+				bool mode_is_either = (mode_is_U || mode_is_A);
+				
+				if (mode_is_either)
+				{
+					//if (!PathFileExists((LPCTSTR)path.ToCString<TCHAR>())) // == FALSE
+					if (GetFileAttributes((LPCTSTR)path.ToCString<TCHAR>()) == INVALID_FILE_ATTRIBUTES && GetLastError()==ERROR_FILE_NOT_FOUND)
+					{
+						file = (systemFile)OpenFile((LPCSTR)path.ToCString<CHAR>(), &fileInfo, OF_CREATE|OF_WRITE|OF_READ);
+					}
+					else
+					{
+						file = (systemFile)OpenFile((LPCSTR)path.ToCString<CHAR>(), &fileInfo, OF_WRITE|OF_READ);
+					}
+					
+					isInput = true;
+					isOutput = true;
+					
+					if (mode_is_A)
+					{
+						moveToEnd = true;
+					}
+				}
+				else
+				{
+					return false;
+				}
+			}
+			
+			if (file == FILE_STREAM_NONE || (HFILE)file == HFILE_ERROR)
+			{
 				return false;
+			}
 			
+			_length = (int)SetFilePointer(file, 0, NULL, FILE_END);
+			
+			if (moveToEnd)
+			{
+				_position = _length;
+			}
+			else
+			{
+				SetFilePointer(file, 0, NULL, FILE_BEGIN);
+			}
+		#else
 			String fmode;
-			
-			bool isInput = false;
 			
 			if (mode == "r")
 			{
@@ -211,12 +314,15 @@ namespace external_ioutil
 			else if (mode == "w")
 			{
 				fmode = "wb";
+				
+				isOutput = true;
 			}
 			else if (mode == "u")
 			{
 				fmode = "rb+";
 				
 				isInput = true;
+				isOutput = true;
 			}
 			else
 			{
@@ -234,6 +340,7 @@ namespace external_ioutil
 				if (file == FILE_STREAM_NONE)
 					return false;
 				
+				isOutput = true;
 				isInput = false;
 			}
 			
@@ -244,19 +351,30 @@ namespace external_ioutil
 			fseek(file, 0, SEEK_SET);
 			
 			_position = 0;
-			
-			if (isInput)
-			{
-				input = file;
-			}
-			else
-			{
-				output = file;
-			}
-			
-			// Return the default response.
-			return true;
 		#endif
+		
+		if (isInput)
+		{
+			input = file;
+		}
+		
+		if (isOutput)
+		{
+			output = file;
+		}
+		
+		if (!fallback || !Open(true))
+		{
+			if (input == FILE_STREAM_NONE && output == FILE_STREAM_NONE)
+			{
+				closeFile(file);
+				
+				return false;
+			}
+		}
+		
+		// Return the default response.
+		return true;
 	}
 	
 	bool BBStandardIOStream::ErrOpen()
