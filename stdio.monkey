@@ -3,15 +3,17 @@ Strict
 Public
 
 ' Preprocessor related:
-#If TARGET = "stdcpp" Or TARGET = "glfw" ' Or TARGET = "ios"
+#If LANG = "cpp" Or LANG = "cs" ' TARGET = "stdcpp" Or TARGET = "glfw" ' Or TARGET = "ios"
 	#IOUTIL_STDIO_IMPLEMENTED = True
 #End
 
 #If IOUTIL_STDIO_IMPLEMENTED
 	#If HOST = "winnt"
-		#BBSTDSTREAM_WINNT_NATIVE_HANDLES = True
-		'#BBSTDSTREAM_STD_BINARYHACK = True
-		'#BBSTDSTREAM_WINNT_STD_REOPENHACK = True
+		#If LANG = "cpp"
+			#BBSTDSTREAM_WINNT_NATIVE_HANDLES = True
+			'#BBSTDSTREAM_STD_BINARYHACK = True
+			'#BBSTDSTREAM_WINNT_STD_REOPENHACK = True
+		#End
 	#End
 	
 	' Imports (Public):
@@ -23,6 +25,10 @@ Public
 	Import brl.gametarget
 	Import brl.databuffer
 	
+	#If LANG <> "cpp"
+		Import brl.filestream
+	#End
+	
 	' Native language imports:
 	Import "native/stdio.${LANG}"
 	
@@ -31,16 +37,23 @@ Public
 	' Classes (External):
 	Extern
 	
-	Class BBStandardIOStream Extends BBStream = "external_ioutil::BBStandardIOStream"
-		' Methods:
-		Method Open:Bool()
-		Method Open:Bool(Path:String, Mode:String, Fallback:Bool=False)
-		Method ErrOpen:Bool()
-		
-		Method Length:Int()
-		Method Position:Int()
-		Method Seek:Int(Position:Int)
-	End
+	#If LANG = "cpp"
+		Class BBStandardIOStream Extends BBStream = "external_ioutil::BBStandardIOStream"
+	#Else
+		Class BBStandardIOStream Extends BBStream
+	#End
+			' Methods:
+			Method Open:Bool()
+			
+			#If LANG = "cpp"
+				Method Open:Bool(Path:String, Mode:String, Fallback:Bool=False)
+				Method ErrOpen:Bool()
+			#End
+			
+			Method Length:Int()
+			Method Position:Int()
+			Method Seek:Int(Position:Int)
+		End
 	
 	Public
 	
@@ -52,37 +65,47 @@ Public
 		Function OpenNativeStream:BBStandardIOStream(ErrorInfo:Bool=False)
 			Local StandardStream:= New BBStandardIOStream()
 			
-			If (Not ErrorInfo) Then
-				StandardStream.Open()
-			Else
-				StandardStream.ErrOpen()
-			Endif
+				If (Not ErrorInfo) Then
+					StandardStream.Open()
+			#If LANG = "cpp"
+				Else
+					StandardStream.ErrOpen()
+			#End
+				Endif
 			
 			Return StandardStream
 		End
 		
-		Function OpenNativeStream:BBStandardIOStream(Path:String, Mode:String, Fallback:Bool=False)
-			Local StandardStream:= New BBStandardIOStream()
-			
-			Local RealMode:= Mode
-			
-			#If Not BBSTDSTREAM_WINNT_NATIVE_HANDLES
-				If (RealMode = "a") Then
-					RealMode = "u"
+		Function OpenNativeStream:BBStream(Path:String, Mode:String, Fallback:Bool=False)
+			#If LANG = "cpp"
+				Local StandardStream:= New BBStandardIOStream()
+				
+				Local RealMode:= Mode
+				
+				#If Not BBSTDSTREAM_WINNT_NATIVE_HANDLES
+					If (RealMode = "a") Then
+						RealMode = "u"
+					Endif
+				#End
+				
+				If (Not StandardStream.Open(Path, RealMode, Fallback)) Then
+					Return Null
 				Endif
+				
+				#If Not BBSTDSTREAM_WINNT_NATIVE_HANDLES
+					If (Mode = "a") Then
+						StandardStream.Seek(StandardStream.Length())
+					Endif
+				#End
+				
+				Return StandardStream
+			#Elseif LANG = "cs"
+				Local FStream:= New BBFileStream()
+				
+				FStream.Open(Path, Mode)
+				
+				Return FStream
 			#End
-			
-			If (Not StandardStream.Open(Path, RealMode, Fallback)) Then
-				Return Null
-			Endif
-			
-			#If Not BBSTDSTREAM_WINNT_NATIVE_HANDLES
-				If (Mode = "a") Then
-					StandardStream.Seek(StandardStream.Length())
-				Endif
-			#End
-			
-			Return StandardStream
 		End
 		
 		Public
@@ -138,7 +161,7 @@ Public
 		' Fields (Protected):
 		Protected
 		
-		Field NativeStream:BBStandardIOStream
+		Field NativeStream:BBStream ' BBStandardIOStream
 		
 		Public
 	End
