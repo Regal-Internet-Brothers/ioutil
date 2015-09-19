@@ -13,6 +13,7 @@ Public
 			#BBSTDSTREAM_WINNT_NATIVE_HANDLES = True
 			'#BBSTDSTREAM_STD_BINARYHACK = True
 			'#BBSTDSTREAM_WINNT_STD_REOPENHACK = True
+			#BBSTDSTREAM_CLEAR_IMPLEMENTED = True
 		#End
 		
 		#BBSTDSTREAM_FLUSH_IMPLEMENTED = True
@@ -56,6 +57,10 @@ Public
 			
 			#If BBSTDSTREAM_FLUSH_IMPLEMENTED
 				Method Flush:Void()
+			#End
+			
+			#If BBSTDSTREAM_CLEAR_IMPLEMENTED
+				Method Clear:Void()
 			#End
 			
 			Method Length:Int()
@@ -162,6 +167,14 @@ Public
 		Method Flush:Void()
 			#If BBSTDSTREAM_FLUSH_IMPLEMENTED
 				RealHandle.Flush()
+			#End
+			
+			Return
+		End
+		
+		Method Clear:Void()
+			#If BBSTDSTREAM_CLEAR_IMPLEMENTED
+				RealHandle.Clear()
 			#End
 			
 			Return

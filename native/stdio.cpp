@@ -16,6 +16,11 @@
 	//#include <winbase.h>
 	#include <tchar.h>
 	//#include <shlwapi.h>
+	
+	#if defined(CFG_BBSTDSTREAM_CLEAR_IMPLEMENTED)
+		//#include <conio.h>
+		//#include <cstdio>
+	#endif
 #else
 	//#include <cstdio>
 	
@@ -65,6 +70,7 @@ namespace external_ioutil
 			bool ErrOpen();
 			
 			void Flush();
+			void Clear();
 			
 			int Eof(); // const;
 			int Length(); // const;
@@ -404,6 +410,15 @@ namespace external_ioutil
 			
 			if (output != FILE_STREAM_NONE)
 				fflush(output);
+		#endif
+		
+		return;
+	}
+	
+	void BBStandardIOStream::Clear()
+	{
+		#ifdef CFG_BBSTDSTREAM_CLEAR_IMPLEMENTED
+			system("cls"); // clrscr();
 		#endif
 		
 		return;
