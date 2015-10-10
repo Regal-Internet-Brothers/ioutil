@@ -21,6 +21,10 @@ Public
 ' Classes:
 Class ChainStream Extends SpecializedChainStream<Stream> Final
 	' Constructor(s):
+	Method New(BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
+		Super.New(BigEndian, CloseRights, Link)
+	End
+	
 	Method New(Streams:Stream[], BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
 		Super.New(Streams, BigEndian, CloseRights, Link)
 	End
@@ -39,6 +43,9 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	Const Default_BigEndian:Bool = False
 	
 	' Constructor(s) (Public):
+	Method New(BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
+		Construct(New Stack<StreamType>(), BigEndian, CloseRights, Link)
+	End
 	
 	' All containers passed to these constructors should be assumed to be under this object's control:
 	Method New(Streams:StreamType[], BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
