@@ -86,6 +86,9 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	End
 	
 	' Methods (Public):
+	Method ObjectEnumerator:stack.Enumerator<StreamType>()
+		Return Chain.ObjectEnumerator()
+	End
 	
 	' This is pretty bloated, but it works:
 	Method Seek:Int(Position:Int)
