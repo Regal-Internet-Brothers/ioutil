@@ -48,27 +48,27 @@ Function Main:Int()
 	' Local variable(s):
 	
 	' This will act as our canonical streams.
-	Local Streams:Stream[StreamCount]
+	Local Streams:= New Stack<Stream>()
 	
 	' Create the first "node" stream with the padding we described.
-	Streams[0] = IntStream(Scale, Padding)
+	Streams.Push(IntStream(Scale, Padding))
 	
-	' For every other "node", don't bother with padding:
-	For Local I:= 1 Until StreamCount
-		Streams[I] = IntStream((I+1)*Scale)
-	Next
-	
-	' Create our chain stream, using our array.
+	' Create our chain stream, using our stack.
 	' By default, closing-rights are assumed.
 	Local S:= New ChainStream(Streams)
 	
 	' Seek past the padding.
 	S.Seek(Padding)
 	
-	' Read every integer emitted previously.
-	While (Not S.Eof)
+	Print(S.ReadInt())
+	
+	' Constantly add streams to the chain, as we read forward:
+	For Local I:= 1 Until StreamCount
+		' For every other "node", don't bother with padding.
+		S.Links.Push(IntStream((I+1)*Scale))
+		
 		Print(S.ReadInt())
-	Wend
+	Next
 	
 	' Close our chain, including the "node" streams.
 	S.Close()

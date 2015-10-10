@@ -309,6 +309,8 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	
 	Method ResetLength:Void()
 		Self._Length = 0
+		
+		Return
 	End
 	
 	' Call-backs:

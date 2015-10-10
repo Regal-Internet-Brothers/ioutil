@@ -19,9 +19,13 @@ Import brl.databuffer
 Public
 
 ' Classes:
-Class ChainStream Extends SpecializedChainStream<Stream>
+Class ChainStream Extends SpecializedChainStream<Stream> Final
 	' Constructor(s):
 	Method New(Streams:Stream[], BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
+		Super.New(Streams, BigEndian, CloseRights, Link)
+	End
+	
+	Method New(Streams:Stack<StreamType>, BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
 		Super.New(Streams, BigEndian, CloseRights, Link)
 	End
 End
@@ -34,25 +38,42 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	' Booleans / Flags:
 	Const Default_BigEndian:Bool = False
 	
-	' Constructor(s):
+	' Constructor(s) (Public):
+	
+	' All containers passed to these constructors should be assumed to be under this object's control:
 	Method New(Streams:StreamType[], BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
+		Construct(New Stack<StreamType>(Streams), BigEndian, CloseRights, Link)
+	End
+	
+	Method New(Streams:Stack<StreamType>, BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
+		Construct(Streams, BigEndian, CloseRights, Link)
+	End
+	
+	' Constructor(s) (Protected):
+	Protected
+	
+	Method Construct:Void(Streams:Stack<StreamType>, BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
 		Self.Chain = Streams
 		Self.Link = Link
 		
 		Self.BigEndian = BigEndian
 		Self.CanCloseStreams = CloseRights
+		
+		Return
 	End
+	
+	Public
 	
 	' Destructor(s):
 	Method Close:Void()
 		If (CanCloseStreams) Then
-			For Local I:= 0 Until LinkCount
-				Chain[I].Close()
+			For Local Node:= Eachin Chain
+				Node.Close()
 			Next
 		Endif
 		
 		' Empty the stream-chain.
-		Chain = []
+		Chain.Clear()
 		
 		Return
 	End
@@ -71,7 +92,7 @@ Class SpecializedChainStream<StreamType> Extends Stream
 				Target = I
 				BackwardOffset = CL
 			Else
-				Chain[I].Seek(0)
+				Chain.Get(I).Seek(0)
 			Endif
 		Next
 		
@@ -184,10 +205,10 @@ Class SpecializedChainStream<StreamType> Extends Stream
 		
 		For Local I:= 0 Until LinkPosition
 			' Add the length of the previous link in the chain.
-			P += Chain[I].Length
+			P += Chain.Get(I).Length
 		Next
 		
-		Return (P + Chain[LinkPosition].Position)
+		Return (P + Chain.Get(LinkPosition).Position)
 	End
 	
 	Public
@@ -206,8 +227,8 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	Method Length:Int() Property
 		Local L:Int = 0
 		
-		For Local I:= 0 Until LinkCount
-			L += Chain[I].Length
+		For Local Node:= Eachin Chain
+			L += Node.Length
 		Next
 		
 		Return L
@@ -222,7 +243,7 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	
 	' A public "accessor" for the internal "chain".
 	' Mutation may result in undefined behavior; use at your own risk.
-	Method Links:StreamType[]() Property
+	Method Links:Stack<StreamType>() Property
 		Return Self.Chain
 	End
 	
@@ -247,12 +268,12 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	
 	' The current stream-link in the chain. (Use at your own risk)
 	Method CurrentLink:StreamType() Property
-		Return Chain[Link]
+		Return Chain.Get(Link)
 	End
 	
 	' The final stream in the "chain". (Use at your own risk)
 	Method FinalLink:StreamType() Property
-		Return Chain[FinalChainIndex]
+		Return Chain.Get(FinalChainIndex)
 	End
 	
 	Public
@@ -262,7 +283,7 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	
 	' A "chain" of streams representing
 	' the data this stream delegates.
-	Field Chain:StreamType[]
+	Field Chain:Stack<StreamType>
 	
 	' The active element of 'Chain';
 	' the stream currently used for I/O.
