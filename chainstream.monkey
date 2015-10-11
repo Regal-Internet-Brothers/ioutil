@@ -254,7 +254,7 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	' A public "accessor" for the internal "chain".
 	' Mutation may result in undefined behavior; use at your own risk.
 	Method Links:Stack<StreamType>() Property
-		Return Self.Chain
+		Return Chain
 	End
 	
 	' The number of links in the internal "chain".

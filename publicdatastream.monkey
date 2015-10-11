@@ -210,15 +210,9 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 			If (ShouldResize) Then
 				AutoResize(Count)
 			Else
-				Return 0
+				Count = (DataLength-Position) ' Max(..., 0)
 			Endif
 		Endif
-		
-		#Rem
-			For Local Index:= 0 Until Count
-				Self.Data.PokeByte(Offset+Position+Index, Buf.PeekByte(Offset+Index))
-			Next
-		#End
 		
 		Buf.CopyBytes(Offset, Self.Data, Self.DataOffset, Count)
 		
