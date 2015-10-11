@@ -189,11 +189,7 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	Method Write:Int(Buffer:DataBuffer, Offset:Int, Count:Int)
 		Local BytesWritten:= CurrentLink.Write(Buffer, Offset, Count)
 		
-		If (BytesWritten < Count) Then
-			If (OnFinalLink) Then
-				Return 0 ' -1
-			Endif
-			
+		If (Not OnFinalLink And BytesWritten < Count) Then
 			Link += 1
 			
 			Return (BytesWritten + Write(Buffer, Offset+BytesWritten, (Count-BytesWritten)))
