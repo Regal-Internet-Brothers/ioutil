@@ -218,7 +218,7 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 		
 		Self._Position = NewPosition
 		
-		SetLength(NewPosition)
+		SetLengthSafe(NewPosition)
 		
 		Return Count
 	End
@@ -296,7 +296,13 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	End
 	
 	Method SetLength:Void(Value:Int)
-		Self._Length = Min(Max(Value, Self._Length), DataLength)
+		Self._Length = Min(Value, DataLength)
+		
+		Return
+	End
+	
+	Method SetLengthSafe:Void(Value:Int)
+		SetLength(Max(Value, Self._Length))
 		
 		Return
 	End
