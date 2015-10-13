@@ -221,6 +221,12 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	
 	' Properties (Public):
 	
+	' The active element of 'Chain';
+	' the stream currently used for I/O.
+	Method Link:Int() Property
+		Return Self._Link
+	End
+	
 	' This specifies if we are at the end of the stream.
 	' This uses the final chain as a reference, as normal operations
 	' will automatically move through each link in the chain.
@@ -267,6 +273,13 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	' Properties (Protected):
 	Protected
 	
+	' This acts as the internal mutation property for '_Link'.
+	Method Link:Void(Input:Int) Property
+		Self._Link = Input
+		
+		Return
+	End
+	
 	' The final chain-index (Link) in the chain.
 	Method FinalChainIndex:Int() Property
 		Return Max(LinkCount-1, 0)
@@ -291,9 +304,8 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	' the data this stream delegates.
 	Field Chain:Stack<StreamType>
 	
-	' The active element of 'Chain';
-	' the stream currently used for I/O.
-	Field Link:Int
+	' See the 'Link' property for details.
+	Field _Link:Int
 	
 	' Booleans / Flags:
 	

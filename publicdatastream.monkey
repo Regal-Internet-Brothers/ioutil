@@ -50,8 +50,10 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 			Self.Data = B
 		Endif
 		
-		Self._Offset = Offset
+		Self.Offset = Offset
 		Self._Length = Length
+		
+		Self.RawSize = Length
 		
 		Self.BigEndianStorage = BigEndianStorage
 		Self.ShouldResize = Resizable
@@ -73,6 +75,7 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	
 	Method GenerateBuffer:Void(Size:Int)
 		Self.Data = New DataBuffer(Size)
+		Self.RawSize = Size
 		
 		Return
 	End
@@ -100,14 +103,16 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 		
 		OwnsBuffer = False
 		
+		RawSize = 0
+		
 		Return
 	End
 	
 	Method Close:Void()
 		FreeBuffer(OwnsBuffer)
 		
+		Self.Offset = 0
 		Self._Position = 0
-		Self._Offset = 0
 		
 		Return
 	End
@@ -128,7 +133,15 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	
 	' This states if the number of bytes specified may be read safely.
 	Method WillOverReach:Bool(Bytes:Int)
+		Return ReadWillOverReach(Bytes)
+	End
+	
+	Method ReadWillOverReach:Bool(Bytes:Int)
 		Return (Position+Bytes > Length)
+	End
+	
+	Method WriteWillOverReach:Bool(Bytes:Int)
+		Return (Position+Bytes > DataLength) ' Length
 	End
 	
 	Method ReadShort:Int()
@@ -323,7 +336,13 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 		Return
 	End
 	
-	' Properties:
+	' Properties (Public):
+	
+	' The internal I/O buffer.
+	Method Data:DataBuffer() Property
+		Return Self._Data
+	End
+	
 	Method Eof:Int() Property
 		Return (Position >= Length)
 	End
@@ -333,19 +352,19 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 		Return Self._Length
 	End
 	
-	' The internal offset/starting point in the 'Data' buffer.
-	Method Offset:Int() Property
-		Return Self._Offset
-	End
-	
 	' The number of bytes into the buffer this stream is.
 	Method Position:Int() Property
 		Return Self._Position
 	End
 	
 	' The overall length of the 'Data' buffer. (Taking 'Offset' into account)
+	Method RawSize:Int() Property
+		Return Self._RawSize
+	End
+	
+	' This will return the 'RawSize' property adjusted to the internal offset.
 	Method DataLength:Int() Property
-		Return (Data.Length - Offset)
+		Return (RawSize - Offset)
 	End
 	
 	' The real position in the 'Data' buffer. (After 'Offset')
@@ -358,20 +377,40 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 		Return Max(Length - Position, 0)
 	End
 	
+	' This specifies the number of bytes left.
+	' (Based on 'RawSize' and 'DataOffset'; use at your own risk)
+	Method RealBytesLeft:Int() Property
+		Return Max(RawSize - DataOffset, 0)
+	End
+	
 	' This may be used for asynchronous buffer-loading.
 	Method DataReady:Bool() Property
 		Return (Data <> Null)
 	End
 	
-	' Fields:
+	' Properties (Protected):
+	Protected
 	
-	' The internal I/O buffer.
-	Field Data:DataBuffer
+	Method Data:Void(Input:DataBuffer) Property
+		Self._Data = Input
+		
+		Return
+	End
 	
-	' Please use the corresponding properties when possible:
+	Method RawSize:Void(Input:Int) Property
+		Self._RawSize = Input
+		
+		Return
+	End
+	
+	Public
+	
+	' Fields (Public):
+	
+	' Please use any corresponding properties when possible:
 	
 	' This acts as an internal offset inside the 'Data' buffer.
-	Field _Offset:Int
+	Field Offset:Int
 	
 	' The (Local) position of the stream.
 	Field _Position:Int
@@ -396,4 +435,12 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	
 	' This specifies if this stream owns the internal buffer.
 	Field OwnsBuffer:Bool
+	
+	' Fields (Protected):
+	Protected
+	
+	Field _Data:DataBuffer
+	Field _RawSize:Int
+	
+	Public
 End
