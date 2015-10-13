@@ -173,11 +173,7 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	Method Read:Int(Buffer:DataBuffer, Offset:Int, Count:Int)
 		Local BytesRead:= CurrentLink.Read(Buffer, Offset, Count)
 		
-		If (BytesRead < Count) Then
-			If (OnFinalLink) Then
-				Return 0 ' -1
-			Endif
-			
+		If (Not OnFinalLink And BytesRead < Count) Then
 			Link += 1
 			
 			Return (BytesRead + Read(Buffer, Offset+BytesRead, (Count-BytesRead)))
