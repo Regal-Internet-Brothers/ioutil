@@ -13,6 +13,7 @@ Import errors
 ' Experimental:
 #If IOUTIL_EXPERIMENTAL
 	Import wrapperstream
+	Import stringstream
 	Import chainstream
 	Import repeater
 	Import stdio

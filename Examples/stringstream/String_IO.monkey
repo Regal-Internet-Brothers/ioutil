@@ -9,8 +9,7 @@ Import ioutil.stringstream
 Function Main:Int()
 	Local S:= New StringStream()
 	
-	S.WriteString("Hello world.")
-	S.EndLine()
+	S.WriteString("Hello world."); S.EndLine()
 	
 	S.WriteString("This is a test.~n")
 	S.WriteLine("Lines can be written with 'WriteLine' as well as using '~~n' and 'EndLine'.")
