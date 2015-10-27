@@ -3,10 +3,10 @@ Strict
 Public
 
 ' Imports:
-Import ioutil.publicdatastream
-Import ioutil.chainstream
+Import regal.ioutil.publicdatastream
+Import regal.ioutil.chainstream
 
-Import sizeof
+Import regal.sizeof
 
 ' Functions:
 

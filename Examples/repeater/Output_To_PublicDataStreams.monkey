@@ -3,10 +3,10 @@ Strict
 Public
 
 ' Imports:
-Import sizeof
+Import regal.sizeof
 
-Import ioutil.repeater
-Import ioutil.publicdatastream
+Import regal.ioutil.repeater
+Import regal.ioutil.publicdatastream
 
 ' Functions:
 Function Main:Int()

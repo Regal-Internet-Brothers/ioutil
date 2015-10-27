@@ -3,7 +3,7 @@ Strict
 Public
 
 ' Imports:
-Import ioutil.stdio
+Import regal.ioutil.stdio
 
 ' Functions:
 Function Main:Int()

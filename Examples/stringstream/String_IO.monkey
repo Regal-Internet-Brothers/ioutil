@@ -3,7 +3,7 @@ Strict
 Public
 
 ' Imports:
-Import ioutil.stringstream
+Import regal.ioutil.stringstream
 
 ' Functions:
 Function Main:Int()

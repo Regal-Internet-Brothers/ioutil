@@ -3,9 +3,8 @@ Strict
 Public
 
 ' Imports:
-Import publicdatastream
-
-Import time
+Import regal.ioutil.publicdatastream
+Import regal.time
 
 Import brl.datastream
 

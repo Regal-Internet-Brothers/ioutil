@@ -12,7 +12,7 @@ Import brl.stream
 ' Imports (Private):
 Private
 
-Import byteorder
+Import regal.byteorder
 
 Import brl.databuffer
 
@@ -20,7 +20,7 @@ Public
 
 ' Classes:
 Class ChainStream Extends SpecializedChainStream<Stream> Final
-	' Constructor(s):
+	' Construct_SpecializedChainStreamor(s):
 	Method New(BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
 		Super.New(BigEndian, CloseRights, Link)
 	End
@@ -42,24 +42,24 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	' Booleans / Flags:
 	Const Default_BigEndian:Bool = False
 	
-	' Constructor(s) (Public):
+	' Construct_SpecializedChainStreamor(s) (Public):
 	Method New(BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
-		Construct(New Stack<StreamType>(), BigEndian, CloseRights, Link)
+		Construct_SpecializedChainStream(New Stack<StreamType>(), BigEndian, CloseRights, Link)
 	End
 	
 	' All containers passed to these constructors should be assumed to be under this object's control:
 	Method New(Streams:StreamType[], BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
-		Construct(New Stack<StreamType>(Streams), BigEndian, CloseRights, Link)
+		Construct_SpecializedChainStream(New Stack<StreamType>(Streams), BigEndian, CloseRights, Link)
 	End
 	
 	Method New(Streams:Stack<StreamType>, BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
-		Construct(Streams, BigEndian, CloseRights, Link)
+		Construct_SpecializedChainStream(Streams, BigEndian, CloseRights, Link)
 	End
 	
-	' Constructor(s) (Protected):
+	' Construct_SpecializedChainStreamor(s) (Protected):
 	Protected
 	
-	Method Construct:Void(Streams:Stack<StreamType>, BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
+	Method Construct_SpecializedChainStream:Void(Streams:Stack<StreamType>, BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
 		Self.Chain = Streams
 		Self.Link = Link
 		

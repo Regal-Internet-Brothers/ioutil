@@ -3,8 +3,8 @@ Strict
 Public
 
 ' Imports:
-Import ioutil.stdio
-Import ioutil.repeater
+Import regal.ioutil.stdio
+Import regal.ioutil.repeater
 
 Import brl.filestream
 

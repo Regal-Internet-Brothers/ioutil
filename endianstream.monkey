@@ -10,7 +10,7 @@ Private
 
 Import wrapperstream
 
-Import byteorder
+Import regal.byteorder
 
 Import brl.databuffer
 

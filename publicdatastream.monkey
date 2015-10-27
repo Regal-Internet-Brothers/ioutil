@@ -6,7 +6,7 @@ Public
 ' Nothing so far.
 
 ' Imports (Public):
-Import byteorder
+Import regal.byteorder
 
 ' BRL:
 Import brl.stream
@@ -14,7 +14,7 @@ Import brl.stream
 ' Imports (Private):
 Private
 
-Import util
+Import regal.util
 
 ' BRL:
 Import brl.databuffer

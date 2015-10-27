@@ -14,7 +14,7 @@ Private
 
 Import wrapperstream
 
-Import sizeof
+Import regal.sizeof
 
 Import brl.databuffer
 
