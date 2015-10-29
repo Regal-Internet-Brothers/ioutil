@@ -320,8 +320,15 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 		Return
 	End
 	
+	' This sets the internal length to the current position.
+	Method ClampToPosition:Void()
+		SetLength(Position)
+		
+		Return
+	End
+	
 	Method ResetLength:Void()
-		Self._Length = 0
+		SetLength(0)
 		
 		Return
 	End

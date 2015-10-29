@@ -48,6 +48,8 @@ Class StringStream Extends PublicDataStream
 		End
 	#End
 	
+	' This echoes the raw content of this stream.
+	' To echo up to the current position, use 'EchoHere'.
 	Method Echo:String(Encoding:String="utf8")
 		Local P:= Position
 		
@@ -58,6 +60,24 @@ Class StringStream Extends PublicDataStream
 		Seek(P)
 		
 		Return Output
+	End
+	
+	' This echoes using the position specified.
+	Method Echo:String(Position:Int, Encoding:String="utf8")
+		Local P:= Self.Position
+		
+		Seek(0)
+		
+		Local Output:= ReadString(Position, Encoding)
+		
+		Seek(P)
+		
+		Return Output
+	End
+	
+	' This echoes using the current position.
+	Method EchoHere:String(Encoding:String="utf8")
+		Return EchoHere(Self.Position, Encoding)
 	End
 	
 	Method WriteChar:Void(Value:Int)
