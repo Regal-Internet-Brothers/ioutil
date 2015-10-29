@@ -77,7 +77,7 @@ Class StringStream Extends PublicDataStream
 	
 	' This echoes using the current position.
 	Method EchoHere:String(Encoding:String="utf8")
-		Return EchoHere(Self.Position, Encoding)
+		Return Echo(Self.Position, Encoding)
 	End
 	
 	Method WriteChar:Void(Value:Int)
