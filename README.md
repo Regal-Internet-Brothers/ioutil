@@ -1,7 +1,7 @@
 # ioutil
 A module for the [Monkey programming language](https://github.com/blitz-research/monkey), providing several useful I/O components.
 
-### Features (Some are experimental):
+### Features (Some may be experimental):
 * '**ChainStream**': A tool for turning a set of 'Stream' objects into a continuous I/O stream. ('SpecializedChainStream')
 * '**Repeater**': A 'WrapperStream' that allows you to output to multiple 'Stream' objects at once. This is also useful when transferring data from one input 'Stream' to one or more output 'Streams'. ('SpecializedRepeater')
 * '**WrapperStream**': An interface layer between an enclosed 'Stream' and the code using it; allows for method overrides without class-extension. Useful for things like byte-swapping, encapsulation, etc.
