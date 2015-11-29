@@ -28,12 +28,16 @@ Class StringStream Extends PublicDataStream
 	Global Default_Size:= 1024 ' 1KB
 	
 	' Constructor(s):
-	Method New(Message:String, Encoding:String="utf8", FixByteOrder:Bool=Default_BigEndianStorage, InitSize:Int=Default_Size, SizeLimit:Int=NOLIMIT)
+	Method New(Message:String, Encoding:String="utf8", FixByteOrder:Bool=Default_BigEndianStorage, InitSize:Int=Default_Size, SizeLimit:Int=NOLIMIT, SeekBack:Bool=False)
 		Super.New(InitSize, FixByteOrder, True, SizeLimit)
 		
 		WriteString(Message, Encoding)
 		
 		'Self.Encoding = Encoding
+		
+		If (SeekBack) Then
+			Seek(0)
+		Endif
 	End
 	
 	Method New(Size:Int=Default_Size, FixByteOrder:Bool=Default_BigEndianStorage, SizeLimit:Int=NOLIMIT)
