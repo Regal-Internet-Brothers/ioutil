@@ -8,6 +8,8 @@ Import brl.stream
 ' Imports (Private):
 Private
 
+Import regal.sizeof
+
 Import publicdatastream
 
 Public
@@ -29,7 +31,7 @@ Class StringStream Extends PublicDataStream
 	
 	' Constructor(s):
 	Method New(Message:String, Encoding:String="utf8", FixByteOrder:Bool=Default_BigEndianStorage, InitSize:Int=Default_Size, SizeLimit:Int=NOLIMIT, SeekBack:Bool=False)
-		Super.New(InitSize, FixByteOrder, True, SizeLimit)
+		Super.New(Max(InitSize, Message.Length*SizeOf_Char), FixByteOrder, True, SizeLimit)
 		
 		WriteString(Message, Encoding)
 		
