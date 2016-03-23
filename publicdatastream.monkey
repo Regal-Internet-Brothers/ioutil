@@ -24,7 +24,7 @@ Public
 ' Classes:
 Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	' Constant variable(s):
-	Const NOLIMIT:Int = 0
+	Const NOLIMIT:Int = 0 ' -1
 	
 	' Defaults:
 	Const Default_ResizeScalar:Float = 1.5 ' 2.0
