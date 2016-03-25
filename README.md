@@ -1,4 +1,6 @@
 # ioutil
+
+## Description
 A module for the [Monkey programming language](https://github.com/blitz-research/monkey), providing several useful I/O components.
 
 ### Features:
@@ -11,3 +13,6 @@ A module for the [Monkey programming language](https://github.com/blitz-research
 * **StringStream**: A 'PublicDataStream' geared towards 'String' storage, creation, and management. (Class extension reference)
 
 For details on which feature is experimental, please review the [main source file](/ioutil.monkey).
+
+## Installation
+This module is officially distributed with the [Regal Modules](https://github.com/Regal-Internet-Brothers/regal-modules#regal-modules) project. To install this module, please follow the installation guide provided with that repository.
