@@ -92,7 +92,19 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	
 	Public
 	
-	' Destructor(s):
+	' Destructor(s) (Protected):
+	Protected
+	
+	Method DestructDetails:Void()
+		Self.Offset = 0
+		Self._Position = 0
+		
+		Return
+	End
+	
+	Public
+	
+	' Destructor(s) (Public):
 	Method FreeBuffer:Void(DiscardBuffer:Bool=True)
 		If (Data <> Null) Then
 			If (DiscardBuffer) Then
@@ -111,11 +123,20 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	
 	Method Close:Void()
 		FreeBuffer(OwnsBuffer)
-		
-		Self.Offset = 0
-		Self._Position = 0
+		DestructDetails()
 		
 		Return
+	End
+	
+	' The resulting 'DataBuffer' represents the 'Data'
+	' property before destruction takes place.
+	Method CloseWithoutBuffer:DataBuffer()
+		Local OutputBuffer:= Data
+		
+		FreeBuffer(False)
+		DestructDetails()
+		
+		Return OutputBuffer
 	End
 	
 	' Methods:
