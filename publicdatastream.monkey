@@ -76,6 +76,7 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	Method GenerateBuffer:Void(Size:Int)
 		Self.Data = New DataBuffer(Size)
 		Self.RawSize = Size
+		Self.OwnsBuffer = True
 		
 		Return
 	End
