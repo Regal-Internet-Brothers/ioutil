@@ -140,6 +140,17 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	End
 	
 	' Methods:
+	
+	' This creates a 'DataBuffer' by copying 'Data' based on the contents described by this point.
+	' This is useful for handling storage semantics; copies.
+	Method ToDataBuffer:DataBuffer()
+		Local outBuffer:= New DataBuffer(Length)
+		
+		Data.CopyBytes(Offset, outBuffer, 0, Length)
+		
+		Return outBuffer
+	End
+	
 	Method Seek:Int(Input:Int=0)
 		Self._Position = Clamp(Input, 0, DataLength)
 		
