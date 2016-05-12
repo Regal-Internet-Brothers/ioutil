@@ -6,6 +6,9 @@ Strict
 
 Public
 
+' Preprocessor related:
+'#REGAL_IOUTIL_WRAPPERSTREAM_SAFE = True
+
 ' Imports (Public):
 Import brl.stream
 
@@ -19,7 +22,13 @@ Public
 ' Classes:
 Class WrapperStream<StreamType> Extends Stream
 	' Constructor(s):
-	Method New(S:StreamType)
+	Method New(S:StreamType, ThrowOnInvalid:Bool=True)
+		If (ThrowOnInvalid) Then
+			If (S = Null) Then
+				Throw New InvalidWrapperStream(Self, S)
+			Endif
+		Endif
+		
 		Self.InternalStream = S
 	End
 	
@@ -177,6 +186,23 @@ Class WrapperStream<StreamType> Extends Stream
 	Protected
 	
 	Field InternalStream:StreamType
+	
+	Public
+End
+
+' Exceptions:
+Class InvalidWrapperStream Extends StreamError
+	' Constructor(s):
+	Method New(Instance:Stream, WrappedStream:Stream=Null)
+		Super.New(Instance)
+		
+		Self.WrappedStream = WrappedStream
+	End
+	
+	' Fields (Protected):
+	Protected
+	
+	Field WrappedStream:Stream
 	
 	Public
 End
