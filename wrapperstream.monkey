@@ -199,6 +199,11 @@ Class InvalidWrapperStream Extends StreamError
 		Self.WrappedStream = WrappedStream
 	End
 	
+	' Methods:
+	Method ToString:String()
+		Return "An invalid stream was given to a 'WrapperStream' object."
+	End
+	
 	' Fields (Protected):
 	Protected
 	
