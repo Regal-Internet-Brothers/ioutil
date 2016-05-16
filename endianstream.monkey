@@ -2,6 +2,9 @@ Strict
 
 Public
 
+' Preprocessor related:
+#IOUTIL_ENDIANSTREAM_LEGACY_BIG_ENDIAN = True
+
 ' Imports (Public):
 Import brl.stream
 
@@ -33,7 +36,11 @@ Class EndianStreamManager<StreamType> Extends WrapperStream<StreamType>
 		Local Data:= Super.ReadShort()
 		
 		If (BigEndianStorage) Then
-			Return NToHS(Data)
+			#If IOUTIL_ENDIANSTREAM_LEGACY_BIG_ENDIAN
+				Return NToHS(Data)
+			#Else
+				Return NToHS_S(Data)
+			#End
 		Endif
 		
 		Return Data
