@@ -3,7 +3,7 @@ Strict
 Public
 
 ' Preprocessor related:
-' Nothing so far.
+#IOUTIL_PUBLICDATASTREAM_LEGACY_BIG_ENDIAN = True
 
 ' Imports (Public):
 Import regal.byteorder
@@ -179,7 +179,13 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	
 	Method ReadShort:Int()
 		If (BigEndianStorage) Then
-			Return NToHS(Super.ReadShort())
+			Local Value:= Super.ReadShort()
+			
+			#If IOUTIL_PUBLICDATASTREAM_LEGACY_BIG_ENDIAN
+				Return NToHS(Value)
+			#Else
+				Return NToHS_S(Value)
+			#End
 		Endif
 		
 		Return Super.ReadShort()
