@@ -164,15 +164,15 @@ Class WrapperStream<StreamType> Extends Stream
 	
 	' Properties:
 	Method Eof:Int() Property
-		Return InternalStream.Eof
+		Return InternalStream.Eof() ' Eof
 	End
 	
 	Method Length:Int() Property
-		Return InternalStream.Length
+		Return InternalStream.Length() ' Length
 	End
 	
 	Method Position:Int() Property
-		Return InternalStream.Position
+		Return InternalStream.Position() ' Position
 	End
 	
 	Method Stream:StreamType() Property
