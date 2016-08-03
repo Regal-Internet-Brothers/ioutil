@@ -33,6 +33,8 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	Const Default_BigEndianStorage:Bool = False
 	
 	' Constructor(s) (Public):
+	
+	' The specified size must be at least 2 bytes large.
 	Method New(Size:Int, BigEndianStorage:Bool=Default_BigEndianStorage, Resizable:Bool=True, SizeLimit:Int=NOLIMIT)
 		GenerateBuffer(Size)
 		
@@ -348,7 +350,13 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 		
 		Data = ResizeBuffer(Data, NewSize, True, True, True)
 		
-		Return (Data <> Null)
+		If (Data <> Null) Then
+			RawSize = NewSize ' Data.Length
+			
+			Return True
+		Endif
+		
+		Return False
 	End
 	
 	Method SetLength:Void(Value:Int)
