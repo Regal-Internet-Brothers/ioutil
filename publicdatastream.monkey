@@ -73,6 +73,10 @@ Class PublicDataStream Extends Stream Implements IOnLoadDataComplete
 	' Constructor(s) (Protected):
 	Protected
 	
+	Method New()
+		' Nothing so far.
+	End
+	
 	Method GenerateBuffer:Void(Size:Int)
 		Self.Data = New DataBuffer(Size)
 		Self.RawSize = Size
