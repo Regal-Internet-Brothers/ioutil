@@ -78,3 +78,19 @@ Function MaskStream:Void(S:Stream, Mask:Int, Length:Int)
 	
 	Return
 End
+
+Function SeekForward:Int(S:Stream, Bytes:Int)
+	Local NewPosition:= (S.Position + Bytes)
+	
+	S.Seek(NewPosition)
+	
+	Return NewPosition
+End
+
+Function SeekBackward:Int(S:Stream, Bytes:Int)
+	Local NewPosition:= (S.Position - Bytes)
+	
+	S.Seek(NewPosition)
+	
+	Return NewPosition
+End
