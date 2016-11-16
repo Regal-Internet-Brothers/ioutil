@@ -73,3 +73,11 @@ Function SeekBackward:Int(S:Stream, Bytes:Int)
 	
 	Return NewPosition
 End
+
+Function SeekBegin:Int(S:Stream)
+	Local Position:= S.Position
+	
+	S.Seek(0)
+	
+	Return Position
+End
