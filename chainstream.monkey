@@ -20,7 +20,7 @@ Public
 
 ' Classes:
 Class ChainStream Extends SpecializedChainStream<Stream> Final
-	' Construct_SpecializedChainStreamor(s):
+	' Constructor(s):
 	Method New(BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
 		Super.New(BigEndian, CloseRights, Link)
 	End
@@ -42,7 +42,7 @@ Class SpecializedChainStream<StreamType> Extends Stream
 	' Booleans / Flags:
 	Const Default_BigEndian:Bool = False
 	
-	' Construct_SpecializedChainStreamor(s) (Public):
+	' Constructor(s) (Public):
 	Method New(BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
 		Construct_SpecializedChainStream(New Stack<StreamType>(), BigEndian, CloseRights, Link)
 	End
@@ -56,7 +56,7 @@ Class SpecializedChainStream<StreamType> Extends Stream
 		Construct_SpecializedChainStream(Streams, BigEndian, CloseRights, Link)
 	End
 	
-	' Construct_SpecializedChainStreamor(s) (Protected):
+	' Constructor(s) (Protected):
 	Protected
 	
 	Method Construct_SpecializedChainStream:Void(Streams:Stack<StreamType>, BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
