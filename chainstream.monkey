@@ -29,7 +29,7 @@ Class ChainStream Extends SpecializedChainStream<Stream> Final
 		Super.New(Streams, BigEndian, CloseRights, Link)
 	End
 	
-	Method New(Streams:Stack<StreamType>, BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
+	Method New(Streams:Stack<Stream>, BigEndian:Bool=Default_BigEndian, CloseRights:Bool=True, Link:Int=0)
 		Super.New(Streams, BigEndian, CloseRights, Link)
 	End
 End
