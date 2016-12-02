@@ -9,9 +9,6 @@ Import brl.stream
 
 ' This applies 'Mask' to the contents of 'S' (XOR; useful for networking routines)
 Function MaskStream:Void(S:Stream, Mask:Int, Length:Int)
-	Local SMask:= (((Mask Shr 16) & $FFFF)) ' 16-bit mask. ' ((((Mask Shr 16) | $FFFF0000) & $FFFF))
-	Local BMask:= ((Mask Shr 24) & $FF) ' 8-bit mask. ' (((Mask Shr 24) | $FF000000) & $FF)
-	
 	Local DataPos:= S.Position
 	
 	For Local I:= 1 To Length Step 4 ' SizeOf_Integer ' SizeOf(Mask)
@@ -25,6 +22,9 @@ Function MaskStream:Void(S:Stream, Mask:Int, Length:Int)
 			S.WriteInt(Data ~ Mask)
 		Catch E:StreamReadError
 			Local BytesLeft:= (Length - (Session-DataPos))
+			
+			Local SMask:= (((Mask Shr 16) & $FFFF)) ' 16-bit mask. ' ((((Mask Shr 16) | $FFFF0000) & $FFFF))
+			Local BMask:= ((Mask Shr 24) & $FF) ' 8-bit mask. ' (((Mask Shr 24) | $FF000000) & $FF)
 			
 			S.Seek(Session)
 			
